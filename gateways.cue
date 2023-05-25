@@ -5,7 +5,7 @@ import (
 )
 
 #ociGateway: {
-    ...
+	...
 	gateways: [...#gateways]
 
 	_checks: {
@@ -20,8 +20,15 @@ ociGateway: #ociGateway & {}
 
 #gateway: {
 	name: string
-	type: string
+	type: "file" | "http" | "s3" | "docker" | "git" | "ftp" | "nfs" | "sftp" | "smb" | "vault"
 	...
+}
+
+#dockerGateway: #gateway & {
+	type:     "docker"
+	registry: string
+	insecure: bool | *false
+	httpOnly: bool | *false
 }
 
 #fileGateway: #gateway & {
@@ -29,12 +36,43 @@ ociGateway: #ociGateway & {}
 	rootDir: string
 }
 
+#ftpGateway: #gateway & {
+	type:     "ftp"
+	host:     string
+	port:     number
+	username: string | *""
+	password: string | *""
+	basePath: string | *""
+	insecure: bool | *false
+}
+
+#gitGateway: #gateway & {
+	type:       "git"
+	repoURL:    string
+	username:   string | *""
+	password:   string | *""
+	sshKey:     string | *""
+	sshKeyFile: string | *""
+	insecure:   bool | *false
+	_checks: {
+		onlyOneOfPasswordSSHKeyANDSSHKeyFile: true
+		onlyOneOfPasswordSSHKeyANDSSHKeyFile: (password == "" && sshKey == "" && sshKeyFile == "") || (password != "" && sshKey == "" && sshKeyFile == "") || (password == "" && sshKey != "" && sshKeyFile == "") || (password == "" && sshKey == "" && sshKeyFile != "")
+	}
+}
+
 #httpGateway: #gateway & {
 	type:     "http"
 	baseURL:  string
-	username: string
-	password: string
-	insecure: bool
+	username: string | *""
+	password: string | *""
+	insecure: bool | *false
+}
+
+#nfsGateway: #gateway & {
+	type: "nfs"
+	host: string
+	// username: string // TODO: add username and password
+	// password: string
 }
 
 #s3Gateway: #gateway & {
@@ -42,47 +80,28 @@ ociGateway: #ociGateway & {}
 	endpoint:        string
 	accessKeyID:     string
 	secretAccessKey: string
-	useSSL:          bool
+	useSSL:          bool | *true
 }
 
-#dockerGateway: #gateway & {
-	type: "docker"
-}
-
-#gitGateway: #gateway & {
-	type:     "git"
-	repoURL:  string
-	username: string
-	password: string
-	insecure: bool | *false
-}
-
-#ftpGateway: #gateway & {
-	type:     "ftp"
-	host:     string
-	port:     number
-	username: string
-	password: string
-	insecure: bool | *false
-	basePath: string | *""
-}
-
-#nfsGateway: #gateway & {
-	type:     "nfs"
-	host:     string
-	username: string
-	password: string
-	insecure: bool
-	basePath: string
-}
 #sftpGateway: #gateway & {
 	type:       "sftp"
 	host:       string
 	port:       number
 	username:   string
+	password:   string | *""
 	insecure:   bool
-	sshKeyFile: string
-	basePath:   string
+	basePath:   string | *""
+	hostKey:    string | *""
+	sshKey:     string | *""
+	sshKeyFile: string | *""
+	insecure:   bool | *false
+	_checks: {
+		onlyOneOfPasswordSSHKeyANDSSHKeyFile: true
+		onlyOneOfPasswordSSHKeyANDSSHKeyFile: (password == "" && sshKey == "" && sshKeyFile == "") || (password != "" && sshKey == "" && sshKeyFile == "") || (password == "" && sshKey != "" && sshKeyFile == "") || (password == "" && sshKey == "" && sshKeyFile != "")
+		// when not insecure: hostKey is required
+		hostKeyRequired: !insecure
+		hostKeyRequired: hostKey != ""
+	}
 }
 
 #smbGateway: #gateway & {
@@ -97,7 +116,8 @@ ociGateway: #ociGateway & {}
 	type:     "vault"
 	endpoint: string
 	token:    string
-	basePath: string
+	basePath: string | *""
+	insecure: bool | *false
 }
 
-#gateways:  #fileGateway | #httpGateway | #s3Gateway | #dockerGateway | #gitGateway | #ftpGateway | #nfsGateway | #sftpGateway | #smbGateway | #vaultGateway
+#gateways: #fileGateway | #httpGateway | #s3Gateway | #dockerGateway | #gitGateway | #ftpGateway | #nfsGateway | #sftpGateway | #smbGateway | #vaultGateway

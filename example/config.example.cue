@@ -1,7 +1,7 @@
 package ocigatewayexample
 
 import (
-	cfg "github.com/mheers/ocigateway/config"
+	cfg "github.com/mheers/ocigateway"
 )
 
 version: "2.0"
@@ -21,10 +21,10 @@ cfg.#ociGateway & {
 	gateways: [
 		cfg.#ftpGateway & {
 			name:     "my-ftp"
-			username: "Marcel"
-			password: "1234"
 			host:     "ftp.myhost.com"
 			port:     21
+			username: "Marcel"
+			password: "1234"
 		},
 		cfg.#ftpGateway & {
 			name:     "my-ftps"
@@ -35,12 +35,18 @@ cfg.#ociGateway & {
 		},
 		cfg.#gitGateway & {
 			name:     "my-git"
+			repoURL:  "my-repo"
+			// sshKey:   "my-ssh-key"
+			// sshKeyFile:   "my-ssh-key"
+			password: "1234"
+		},
+		cfg.#sftpGateway & {
+			name:     "my-sftp"
+			host:     "sftp.myhost.com"
+			port:     22
 			username: "Marcel"
 			password: "1234"
-			host:     "ftp.myhost.com"
-			port:     21
-			repoURL:  "my-repo"
-			sshKey:   "my-ssh-key"
+			insecure: true // if false we need to set hostKey
 		},
 	]
 }
