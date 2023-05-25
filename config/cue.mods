@@ -1,0 +1,3 @@
+module github.com/mheers/ocigateway/config
+
+cue v0.4.3

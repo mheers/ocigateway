@@ -1,0 +1,9 @@
+module github.com/mheers/ocigatewayexample
+
+cue v0.4.3
+
+require (
+    github.com/mheers/ocigateway/config v0.0.0-20210914104905-8b9b8b0b9b0a
+)
+
+replace github.com/mheers/ocigateway/config => ../config
