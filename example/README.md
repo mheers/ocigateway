@@ -9,7 +9,7 @@
 
 ```bash
 hof mod init cue github.com/mheers/ocigatewayexample
-hof mod get github.com/mheers/ocigateway/config
+hof mod get github.com/mheers/ocigateway
 hof mod vendor cue
 touch config.example.cue
 ```
@@ -20,7 +20,7 @@ touch config.example.cue
 package ocigatewayexample
 
 import (
-	cfg "github.com/mheers/ocigateway/config"
+	cfg "github.com/mheers/ocigateway"
 )
 
 cfg.#ociGateway & {
